@@ -1,0 +1,23 @@
+#!/usr/bin/env acbuild-script
+
+# Start the build with an empty ACI
+begin docker://openjdk:8-jre-alpine
+
+# Name the ACI
+set-name platformlab.stanford.edu/kafka
+
+run -- apk update
+run -- apk add bash
+
+# Install Kafka
+run -- wget -q http://apache.mirrors.hoobly.com/kafka/0.11.0.0/kafka_2.11-0.11.0.0.tgz
+run -- mkdir -p /usr/local/kafka/
+run -- tar -xzf kafka_2.11-0.11.0.0.tgz -C /usr/local/kafka/ --strip-components=1
+run -- rm kafka_2.11-0.11.0.0.tgz
+
+run -- rm /etc/hosts
+
+set-exec -- /usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties
+
+# Save the ACI
+write --overwrite kafka.aci
